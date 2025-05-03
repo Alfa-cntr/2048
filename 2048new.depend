@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1746266779 source:c:\wits\elen2020\projects\midnight\2048new\ai.cpp
+	"ai.h"
+	"board.h"
+	<iostream>
+	<algorithm>
+	<limits>
+	<cmath>
+
+1746266779 source:c:\wits\elen2020\projects\midnight\2048new\board.cpp
+	"Board.h"
+	<cstdlib>
+	<ctime>
+	<iostream>
+
+1746266779 c:\wits\elen2020\projects\midnight\2048new\board.h
+	<vector>
+
+1746266792 source:c:\wits\elen2020\projects\midnight\2048new\main.cpp
+	<iostream>
+	<fstream>
+	"Board.h"
+	"ai.h"
+	<vector>
+
+1746266779 c:\wits\elen2020\projects\midnight\2048new\ai.h
+	"board.h"
+	<utility>
+	<vector>
+
