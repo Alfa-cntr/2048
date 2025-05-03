@@ -101,10 +101,10 @@ int ExpectimaxClass::expectiminimax(vector<vector<int>> curBoard, int depth, boo
         int totalScore=0;
         for(auto[i,j] : emptyTiles)
         {
-            curBoard[i][j]=max_value/2;
+            curBoard[i][j]=min_value*2;
             totalScore +=expectiminimax(curBoard, depth-1, true,numMoves);
 
-            curBoard[i][j]=max_value;
+            curBoard[i][j]=min_value;
             totalScore +=9*expectiminimax(curBoard, depth-1, true,numMoves);
 
             curBoard[i][j]=0;
@@ -120,7 +120,7 @@ char ExpectimaxClass::get_best_move(const vector<vector<int>>& board, int depth,
     int bestScore = INT_MIN;
     char bestMove = 'L';
     char DirChar;
-
+    vector<vector<int>> revBoard = ReverseBoard(board);
     for (int dir= 0; dir<4; ++dir)
     {
         switch(dir)
@@ -143,13 +143,44 @@ char ExpectimaxClass::get_best_move(const vector<vector<int>>& board, int depth,
     }
     return bestMove;
 }
+//function to turn a reverse 2048 board into a normal 2048 board.
+vector<vector<int>> ExpectimaxClass::ReverseBoard(const vector<vector<int>> UnreversedBoard)
+{
+    int power=0;
+    int maxpower=log2(max_value);
+    bool tileturned=false;
+    vector<vector<int>> reversedboard = UnreversedBoard;
+    for (int i=0; i<Size; i++)
+    {
+        for (int j=0; j<Size; j++)
+        {
+            tileturned=false;
+            while (tileturned==false&&power<maxpower)
+            {
+                if (reversedboard[i][j]==pow(2,power))
+                {
+                    reversedboard[i][j]=max_value/(pow(2,power));
+                    power++;
+                    tileturned=true;
+
+                }
+                else
+                {
+                    power++;
+                }
+
+            }
+        }
+    }
+    return reversedboard;
+}
 
 //Function to make a move
-    vector<vector<int>> ExpectimaxClass::move_board(vector<vector<int>> grid, char Direction)
-    {
-        Board tempBoard(Size, max_value, Direction);
-        tempBoard.makeMove(Size,grid,Direction);
-        return grid;
-    }
+vector<vector<int>> ExpectimaxClass::move_board(vector<vector<int>> grid, char Direction)
+{
+    Board tempBoard(Size, max_value, Direction);
+    tempBoard.makeMove(Size,grid,Direction);
+    return grid;
+}
 
 
