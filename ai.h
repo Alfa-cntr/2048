@@ -12,6 +12,7 @@ class ExpectimaxClass
 public:
     ExpectimaxClass(int boardSize, int maxValue, int minValue = 2); // Constructor
 
+    vector<vector<int>> ReverseBoard(vector<vector<int>> UnreversedBoard); //function to turn a reverse 2048 board into a normal 2048 board.
     vector<vector<int>> generate_snake_pattern() const;     //function to make perfect snake pattern
     int evaluate_board(const vector<vector<int>>& board) const;     //function to see how closely a set board matches the perfect snake.
     int expectiminimax(vector<vector<int>> board, int depth, bool isPlayer,int numMoves);    //Basis of expectimax algorithm that simulates potential boards
