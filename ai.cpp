@@ -16,28 +16,26 @@ ExpectimaxClass::ExpectimaxClass(int boardSize, int maxValue, int minValue)
 //Perfect Snake generation
 vector<vector<int>> ExpectimaxClass::generate_snake_pattern() const
 {
-    vector<vector<int>> weights(Size, vector<int>(Size));
-    int weight = max_value;
+    vector<vector<int>> PerfectSnake(Size,vector<int>(Size));
+    int Tile = min_value;
 
     for (int i = 0; i < Size; ++i) {
         if (i % 2 == 0) {
             // Left to right
             for (int j = 0; j < Size; ++j) {
-                weights[i][j] = weight;
-                weight /= 2;
-                if (weight < min_value) weight = min_value;
+                PerfectSnake[i][j] = Tile;
+                Tile *= 2;
             }
         } else {
             // Right to left
             for (int j = Size - 1; j >= 0; --j) {
-                weights[i][j] = weight;
-                weight /= 2;
-                if (weight < min_value) weight = min_value;
+                PerfectSnake[i][j] = Tile;
+                Tile *= 2;
             }
         }
     }
 
-    return weights;
+    return PerfectSnake;
 }
 
 //Evaluate boards heuristic score
@@ -51,18 +49,22 @@ int ExpectimaxClass::evaluate_board(const vector<vector<int>>& board) const
     }
     return score;
 }
+
 //function to recursively give each board state a score.
-int ExpectimaxClass::expectiminimax(vector<vector<int>> board, int depth, bool isPlayer, int numMoves)
+int ExpectimaxClass::expectiminimax(vector<vector<int>> curBoard, int depth, bool isPlayerTurn, int numMoves)
 {
-    Board TempBoard(Size, max_value, 'U');
-    if (depth==0||TempBoard.checkLoss(Size,board,numMoves)==true)
+    int bestscore=0;
+    int score = 0;
+    Board tempBoard(Size, max_value, 'T');
+    if (depth==0||tempBoard.checkLoss(Size,curBoard,numMoves)==true)
     {
-        return evaluate_board(board);
+        return evaluate_board(curBoard);
     }
-    if(isPlayer)
+
+    if (isPlayerTurn==true)
     {
-        int bestScore = INT_MIN;
-        for (int dir=0; dir<4; ++dir)
+        bestscore = INT_MAX;
+        for (int dir=0; dir<4; dir++)
         {
             char DirChar;
             switch(dir)
@@ -72,39 +74,40 @@ int ExpectimaxClass::expectiminimax(vector<vector<int>> board, int depth, bool i
                 case 2: DirChar = 'L'; break;
                 case 3: DirChar = 'R'; break;
             }
-            vector<vector<int>> newBoard= move_board(board,DirChar);
-            if (newBoard!=board)
+            vector<vector<int>> newBoard= move_board(curBoard,DirChar);
+            if (newBoard!=curBoard)
             {
-                int score = expectiminimax(newBoard,depth-1,false,numMoves);
-                bestScore= max(bestScore,score);
+                score = expectiminimax(newBoard,depth-1,false,numMoves);
+                bestscore= max(bestscore,score);
             }
         }
-        return bestScore;
-    } else
+        return bestscore;
+    }
+    else
     {
         vector<pair<int,int>> emptyTiles;
         for (int i =0; i<Size; i++)
         {
             for (int j=0; j<Size; j++)
             {
-                if (board[i][j]==0)
+                if (curBoard[i][j]==0)
                 {
                     emptyTiles.push_back({i,j});
                 }
             }
         }
-        if (emptyTiles.empty()) return evaluate_board(board);
+        if (emptyTiles.empty()) return evaluate_board(curBoard);
 
         int totalScore=0;
         for(auto[i,j] : emptyTiles)
         {
-            board[i][j]=max_value/2;
-            totalScore +=expectiminimax(board, depth-1, true,numMoves);
+            curBoard[i][j]=max_value/2;
+            totalScore +=expectiminimax(curBoard, depth-1, true,numMoves);
 
-            board[i][j]=max_value;
-            totalScore +=9*expectiminimax(board, depth-1, true,numMoves);
+            curBoard[i][j]=max_value;
+            totalScore +=9*expectiminimax(curBoard, depth-1, true,numMoves);
 
-            board[i][j]=0;
+            curBoard[i][j]=0;
         }
 
         return totalScore/(10*emptyTiles.size());
@@ -115,7 +118,7 @@ int ExpectimaxClass::expectiminimax(vector<vector<int>> board, int depth, bool i
 char ExpectimaxClass::get_best_move(const vector<vector<int>>& board, int depth, int numMoves)
 {
     int bestScore = INT_MIN;
-    int bestMove = -1;
+    char bestMove = 'L';
     char DirChar;
 
     for (int dir= 0; dir<4; ++dir)
@@ -134,18 +137,11 @@ char ExpectimaxClass::get_best_move(const vector<vector<int>>& board, int depth,
             if (score>bestScore)
             {
                 bestScore = score;
-                bestMove = dir;
+                bestMove = DirChar;
             }
         }
     }
-    switch (bestMove)
-    {
-        case 0: return 'U';
-        case 1: return 'D';
-        case 2: return 'L';
-        case 3: return 'R';
-        default: return 'FAIL';
-    }
+    return bestMove;
 }
 
 //Function to make a move
@@ -155,4 +151,5 @@ char ExpectimaxClass::get_best_move(const vector<vector<int>>& board, int depth,
         tempBoard.makeMove(Size,grid,Direction);
         return grid;
     }
+
 
